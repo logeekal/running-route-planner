@@ -73,7 +73,7 @@ const RouteMap: FC<IRouteMap> = (props) => {
       containerProps={{
         className: "w-full h-full",
       }}
-      onClick={(e) => handleLocationSelectionFromMap(e)}
+      onClick={(e: any) => handleLocationSelectionFromMap(e)}
     >
       <Spinner loading={loading} />
       {primaryRoute ? (

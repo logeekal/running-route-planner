@@ -1,4 +1,7 @@
-import mgl, { Map, MapboxOptions, EventData, MapMouseEvent } from "mapbox-gl";
+// @ts-ignore
+import mgl, { Map, MapboxOptions, EventData, MapMouseEvent } from '!mapbox-gl'  // eslint-disable-line import/no-webpack-loader-syntax
+
+
 import {
   createContext,
   FC,

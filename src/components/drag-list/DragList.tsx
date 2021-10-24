@@ -44,9 +44,6 @@ export default function DragList(props: IDragList) {
     setRemovableState(removable ||  false)
   },[removable])
 
-
-  useEffect(() => {}, [status]);
-
   const parentRef: Ref<HTMLUListElement> = useRef(null);
   
   useEffect(() => {
@@ -56,6 +53,7 @@ export default function DragList(props: IDragList) {
     }
     else {
      const initialIndex = Array.from(parentRef.current.children).indexOf(draggedElementId.current)
+      console.log("DragList", initialIndex, draggedElementId.current )
      setDragElementInitialIndex(initialIndex)
     }
   }, [draggedElementId]);
@@ -83,7 +81,7 @@ export default function DragList(props: IDragList) {
 
     if (!children) return;
     return Array.from(children)
-      .filter((current) => current != draggedEl)
+      .filter((current) => current !== draggedEl)
       .reduce<{
         offset: number;
         el: Element;
@@ -128,13 +126,13 @@ export default function DragList(props: IDragList) {
       }}
     >
       <ul
-        className="px-4 py-4 list-none draggable-list-container"
+        className={`list-none draggable-list-container ${className ? className : ""}`  }
         {...restProps}
         onDragOver={(e) => {
           e.preventDefault();
           const nearestNode = findNearest(e.clientY, draggedElementId.current);
           if (!nearestNode) return;
-          if (nearestNode.offset == Number.NEGATIVE_INFINITY) {
+          if (nearestNode.offset === Number.NEGATIVE_INFINITY) {
             parentRef?.current?.appendChild(draggedElementId.current);
             setDragElementFinalIndex(orderedChildren.length - 1)
             return;
@@ -153,7 +151,6 @@ export default function DragList(props: IDragList) {
           e.preventDefault()
           const nearestNode = findNearest(e.clientY, draggedElementId.current);
           if (!nearestNode) return;
-          const newIdx = nearestNode.index || dragElementInitialIndex;
           onReorder(dragElementInitialIndex ||0, dragElementFinalIndex || 0)
         }}
         ref={parentRef}

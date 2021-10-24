@@ -1,0 +1,22 @@
+.sidenav {
+  &__container {
+    width: 20rem;
+    max-width: 20rem;
+    transition: max-width 0.5s ease-out;
+  }
+
+  &__container.collapsed {
+    max-width: 0px;
+  }
+
+  &__content {
+    opacity: 1;
+    animation: opacity-animation 0.2s;
+  }
+
+  &__container.collapsed &__content {
+    opacity: 0;
+    animation: opacity-animation 0.2s;
+  }
+}
+

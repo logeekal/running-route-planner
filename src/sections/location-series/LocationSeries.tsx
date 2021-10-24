@@ -1,11 +1,13 @@
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import MapBoxService from "../../services/MapboxService";
-import { debounce } from "../../utils/debounce";
+import { reOrderArray } from "../../utils";
 
-import { debounce as asyncDebounce } from "lodash";
 import { useLocation } from "../../contexts/location/location-provider";
 import DragList from "../../components/drag-list/DragList";
 import DragListItem from "../../components/drag-list/DragListItem";
+
+import { MdDelete } from "react-icons/md";
+import { ImMenu2 } from "react-icons/im";
 
 interface ILocationSeriesProps {
   onFindRoute: (coordinates: Array<[number, number]>) => void;
@@ -15,58 +17,20 @@ const LocationSeries: React.FC<ILocationSeriesProps> = (props) => {
   const {
     locations,
     setLocations,
-    addLocation,
-    updateLocation,
-    orderedLocations,
-    setOrderedLocations,
-    allLocationsObj: allLocations,
-    setAllLocationsObj: setAllLocations,
-    removeUnselectedRoutes,
   } = useLocation();
 
-  const [mapboxService, setMapboxService] = useState(() => new MapBoxService());
+  const [mapboxService, _] = useState(() => new MapBoxService());
 
-  const [locationOptions, setLocationOptions] = useState<any[]>([]);
 
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
 
-  const handleLocationSearch = useCallback(
-    async (value: string) => {
-      console.log("searching locations");
-      const locations = await mapboxService.getLocations(value);
-      let localLocationOptions = locations.features.map((feature: any) => {
-        return {
-          id: feature.id,
-          name: feature.place_name,
-          details: feature,
-        };
-      });
-
-      setLocationOptions([...localLocationOptions]);
-    },
-    [mapboxService]
-  );
-
-  const debouncedSearch = useCallback(
-    asyncDebounce(handleLocationSearch, 500),
-    [handleLocationSearch]
-  );
-
-  const handleChange = async (
-    e: ChangeEvent<HTMLInputElement>,
-    locationId: string
-  ) => {
-    console.log("handling change", e.target.value);
-    updateLocation(locationId, e.target.value, false);
-    if (e.target.value.length === 0) return;
-    debouncedSearch(e.target.value);
-  };
-
   const handleRemoval = (removedId: string) => {
     setLocations((prev: any) => {
-      const newLocations = prev.filter((location: any) => location.id !== removedId);
+      const newLocations = prev.filter(
+        (location: any) => location.id !== removedId
+      );
       return newLocations;
     });
   };
@@ -78,53 +42,35 @@ const LocationSeries: React.FC<ILocationSeriesProps> = (props) => {
     });
 
     setLocations((prev: any) => {
-      let counter = oldIdx;
-      let newItems = [...prev];
-      const temp = newItems[oldIdx];
-      while (counter != newIdx) {
-        console.log({ counter });
-        if (oldIdx < newIdx) {
-          newItems[counter] = newItems[counter + 1];
-          counter++;
-        }
-        if (oldIdx > newIdx) {
-          newItems[counter] = newItems[counter - 1];
-          counter--;
-        }
-        newItems[counter] = temp;
-      }
-      console.log({ newItems });
+      const newItems = reOrderArray(oldIdx, newIdx, prev);
       return [...newItems];
     });
   };
 
-  function handleSelect(locationId: string, orderedLocationId: string) {
-    const selectedLocation = locationOptions.find(
-      (location) => location.id === locationId
-    );
-    setAllLocations({
-      ...allLocations,
-      [orderedLocationId]: selectedLocation.details,
-    });
-    updateLocation(orderedLocationId, selectedLocation["name"], true);
-  }
-
   return (
     <div className="flex flex-col">
-      <DragList onReorder={handleRorder} removable={true}>
+      <DragList className="flex flex-col gap-2" onReorder={handleRorder} removable={false}>
         {locations.map((currLocation) => (
           <DragListItem
-            key={currLocation.id}
-            removeIcon={<p className="p-5 icon text-red-50"> X </p>}
+            id={currLocation.id}
             onRemove={() => handleRemoval(currLocation.id)}
           >
-            <p>{currLocation.text} </p>
+            <div className="flex items-center justify-between w-full text-default">
+              <div className="flex flex-row items-center justify-center">
+                <span className="px-2 mt-1 cursor-move">
+                  <ImMenu2 />
+                </span>
+                <p className="cursor-text">{currLocation.text} </p>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className="px-2 mt-1" onClick={() => handleRemoval(currLocation.id)}>
+                  <MdDelete />
+                </span>
+              </div>
+            </div>
           </DragListItem>
         ))}
       </DragList>
-      <button className="bg-yellow" type="button">
-        Add
-      </button>
     </div>
   );
 };

@@ -1,9 +1,10 @@
-import { FC, HTMLProps, ReactNode, useContext, useRef } from "react";
+import { FC, HTMLProps, ReactNode, RefObject, useContext, useRef } from "react";
 import { DragListContext } from "./DragList";
 
 interface IDragListItem extends HTMLProps<HTMLLIElement> {
   dragIndicatorIcon?: ReactNode;
   removeIcon?: ReactNode;
+  id: string;
   onRemove: () => void;
 }
 
@@ -14,6 +15,7 @@ const DragListItem: FC<IDragListItem> = (props) => {
     setDraggedElementId,
     draggedElementId,
     removable,
+
   } = useContext(DragListContext);
 
   const {
@@ -21,22 +23,22 @@ const DragListItem: FC<IDragListItem> = (props) => {
     className,
     dragIndicatorIcon,
     removeIcon,
+    id,
     onRemove,
     ...restProps
   } = props;
 
-  let itemRef = useRef(null);
+  let itemRef = useRef() as RefObject<HTMLLIElement>;
+  console.log({itemRef:  itemRef.current})
   return (
     <li
       className={`draggable 
+      list__item
       ${
         status === "DRAGGING" && draggedElementId === itemRef
           ? "dragging text-gray-100"
-          : "text-black "
+          : "text-gray-200 "
       }
-      px-4
-      py-2
-      my-2
       bg-white
       flex
       flex-row
@@ -45,6 +47,7 @@ const DragListItem: FC<IDragListItem> = (props) => {
       draggable
       onDragStart={() => {
         setStatus("START");
+        console.log({itemRefDrag : itemRef.current})
         setDraggedElementId(itemRef)
       }}
       onDrag={() => {
@@ -54,6 +57,7 @@ const DragListItem: FC<IDragListItem> = (props) => {
         setStatus("END");
         setDraggedElementId(null);
       }}
+      key={id}
       ref={itemRef}
       {...restProps}
     >

@@ -1,7 +1,6 @@
-import mgl, { Map, MapboxOptions,  EventData, LngLatBounds, LngLatLike, MapboxEvent, MapMouseEvent  } from "mapbox-gl";
+import mgl, { Map, MapboxOptions,  EventData, MapMouseEvent  } from "mapbox-gl";
 import {
   createContext,
-  Dispatch,
   FC,
   HTMLProps,
   useContext,
@@ -10,7 +9,6 @@ import {
   useState,
 } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import {ILocations} from "../../utils/types";
 
 export type IMapContainer = Partial<MapboxOptions> & {
   containerProps: HTMLProps<HTMLDivElement>;
@@ -27,17 +25,19 @@ export interface IMapContext {
 
 const MapContext = createContext<IMapContext>({} as IMapContext);
 
+
 const MapContainer: FC<IMapContainer> = (props) => {
   const { container, containerProps, children, onClick, ...restMapProps } = props;
   const [markers, setMarkers] = useState<Array<mgl.Marker>>([]);
   const [bounds, setBounds] = useState<mgl.LngLatBounds>();
+  const [map, setMap] = useState<Map>();
+  
 
   const MAPBOX_API_KEY = process.env.REACT_APP_MAPBOX_KEY;
   let mapRef = useRef<HTMLDivElement>(null);
 
   mgl.accessToken = MAPBOX_API_KEY!;
 
-  const [map, setMap] = useState<Map>();
 
   useEffect(() => {
     // update bounds
@@ -76,12 +76,23 @@ const MapContainer: FC<IMapContainer> = (props) => {
   }, [bounds]);
 
   useEffect(() => {
+    if(!map) return;
 
-    map && map.on("mouseover", () =>{
+    console.log("observing", map)
+
+    const sizeObserver =  new ResizeObserver(() => map.resize())
+    sizeObserver.observe(mapRef.current as Element)
+
+    map.on("mouseover", () =>{
       map.getCanvas().style.cursor = "crosshair"
     })
 
-    map && onClick && map.on("click",  onClick )
+    onClick && map.on("click",  onClick )
+
+    return () => {
+      console.log("removing observer")
+      sizeObserver.disconnect()
+    }
   },[map])
 
   useEffect(() => {
@@ -91,8 +102,8 @@ const MapContainer: FC<IMapContainer> = (props) => {
         ...restMapProps,
       });
       console.log({ localMap });
+      localMap.getCanvas().style.width ="100%"
       localMap.setCenter([-73.9876, 40.7661]);
-
       setMap(localMap);
     }
   }, [mapRef]);

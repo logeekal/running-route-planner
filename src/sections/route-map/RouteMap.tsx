@@ -17,6 +17,7 @@ import {
 import Layer from "../../components/map/Layer";
 import MapContainer from "../../components/map/MapContainer";
 import Stop from "../../components/map/Stop";
+import Spinner from "../../components/spinner/Spinner";
 import {
   LocationContext,
   useLocation,
@@ -31,14 +32,11 @@ const RouteMap: FC<IRouteMap> = (props) => {
   const { onRoute } = props;
   const {
     locations,
-    addLocation,
-    orderedLocations,
-    allLocationsObj,
-    setAllLocationsObj,
-    getEmptySlotId,
-    updateLocation,
     setLocations,
   } = useContext(LocationContext);
+
+
+  const [ loading, setLoading ] = useState(false)
 
   const handleLocationSelectionFromMap = async (
     e: MapMouseEvent & EventData
@@ -59,7 +57,8 @@ const RouteMap: FC<IRouteMap> = (props) => {
   useEffect(() => {
     if (locations.length > 1) {
       // draw route
-
+      setLoading(true)
+      debugger
       const mapBoxService = new MapBoxService();
 
       const coordinates = locations.map(
@@ -84,7 +83,9 @@ const RouteMap: FC<IRouteMap> = (props) => {
           setPrimaryRoute(geojson);
           onRoute(json);
         });
+      setLoading(false)
     }
+    
   }, [locations]);
 
   return (
@@ -96,6 +97,7 @@ const RouteMap: FC<IRouteMap> = (props) => {
       }}
       onClick={(e) => handleLocationSelectionFromMap(e)}
     >
+      <Spinner loading={loading} />
       {primaryRoute ? (
         <Layer id="primaryRoute" type="line" source={primaryRoute} 
           paint={{
@@ -114,13 +116,13 @@ const RouteMap: FC<IRouteMap> = (props) => {
 
       {locations.map((location, idx) => {
         return (
-          <div className={location.id}>
+          <div className={location.id} key={location.id}>
             <Stop
               feature={location}
               key={location.id}
               icon={
                 <div
-                  className="absolute w-8 h-8 p-1 text-white bg-black rounded-full grid place-items-center"
+                  className="absolute w-8 h-8 p-1 border-4 rounded-full border-accent text-primary bg-primary grid place-items-center"
                   style={{
                     transform: "translate(-50%, -50%)",
                   }}

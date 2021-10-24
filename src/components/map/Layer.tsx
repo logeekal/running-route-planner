@@ -1,18 +1,7 @@
 import { FC, useEffect, useRef } from "react";
-import mgl, { AnyLayer, AnySourceData, Layer as LayerType } from "mapbox-gl";
+import { Layer as LayerType } from "mapbox-gl";
 import { useMap } from "./MapContainer";
 
-{
-  /*
-   *{
-   *
-   *  id: string,
-   *  type: "fill"| "line"| "symbol"| "circle"| "heatmap"| "fill-extrusion"| "raster"| "hillshade"| "background"| "sky";
-   *  source: mgl.GeoJSONSource,
-   *  layout: mgl.la
-   *
-   */
-}
 const Layer: FC<LayerType> = (props) => {
   const { id, type, source, ...restProps } = props;
 
@@ -24,9 +13,9 @@ const Layer: FC<LayerType> = (props) => {
   useEffect(() => {
     return () => {
       if (!map || !layerIDRef.current) return;
+      map.getLayer(layerIDRef.current) && map.removeLayer(layerIDRef.current);
       map.removeSource(layerIDRef.current);
       //remove if layer exists
-      map.getLayer(layerIDRef.current) && map.removeLayer(layerIDRef.current);
     };
   }, []);
 
@@ -51,7 +40,7 @@ const Layer: FC<LayerType> = (props) => {
         ...restProps as any
       });
     }
-  }, [source]);
+  }, [source, map, restProps, id , type]);
 
   return <span></span>;
 };

@@ -16,6 +16,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 export type IMapContainer = Partial<MapboxOptions> & {
   containerProps: HTMLProps<HTMLDivElement>;
   onClick?: (e: MapMouseEvent & EventData) => void;
+  center?: [number, number]
 };
 
 export interface IMapContext {
@@ -26,22 +27,39 @@ export interface IMapContext {
 
 const MapContext = createContext<IMapContext>({} as IMapContext);
 
+
 const MapContainer: FC<IMapContainer> = (props) => {
   const {
     container,
     containerProps,
     children,
     onClick,
+    center: centerFromProps,
     ...restMapProps
   } = props;
   const [markers, setMarkers] = useState<Array<mgl.Marker>>([]);
   const [bounds, setBounds] = useState<mgl.LngLatBounds>();
   const [map, setMap] = useState<Map>();
+  const [center, setCenter] = useState<[number, number]>([77.178118, 28.62019])
 
   const MAPBOX_API_KEY = process.env.REACT_APP_MAPBOX_KEY;
   let mapRef = useRef<HTMLDivElement>(null);
 
   mgl.accessToken = MAPBOX_API_KEY!;
+
+  useEffect(() => {
+    setCenter(centerFromProps)
+  },[centerFromProps])
+
+  useEffect(() => {
+    if(!map ) return;
+    console.log("flying to ", center)
+    map.flyTo({
+      center,
+      essential: true
+    })
+    
+  },[center])
 
   useEffect(() => {
     // update bounds
@@ -106,7 +124,7 @@ const MapContainer: FC<IMapContainer> = (props) => {
         ...restMapProps,
       });
       localMap.getCanvas().style.width = "100%";
-      localMap.setCenter([-73.9876, 40.7661]);
+      localMap.setCenter(center);
       setMap(localMap);
     }
   }, [mapRef]);

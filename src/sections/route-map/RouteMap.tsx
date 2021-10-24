@@ -7,7 +7,11 @@ import Spinner from "../../components/spinner/Spinner";
 import { useLocation } from "../../contexts/location/LocationProvider";
 import MapBoxService from "../../services/MapboxService";
 // @ts-ignore @eslint-disable
-import {  NotificationContainer,  NotificationManager,} from "react-notifications";
+import {
+  NotificationContainer,
+  NotificationManager,
+// @ts-ignore @eslint-disable
+} from "react-notifications";
 
 export interface IRouteMap {
   onRoute: (route: any) => void;
@@ -16,6 +20,10 @@ export interface IRouteMap {
 const RouteMap: FC<IRouteMap> = (props) => {
   const { onRoute } = props;
   const { locations, setLocations } = useLocation();
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  }>();
 
   const [loading, setLoading] = useState(false);
 
@@ -28,16 +36,38 @@ const RouteMap: FC<IRouteMap> = (props) => {
       e.lngLat.lat
     );
     if ("data" in response) {
-      if (response.data && "features" in response.data && response.data.features.length > 0) {
+      if (
+        response.data &&
+        "features" in response.data &&
+        response.data.features.length > 0
+      ) {
         setLocations((prev: any) => [...prev, response.data!.features[0]]);
       } else {
-
         NotificationManager.error(
           "Some Error Occured in retreiving the location. Please try some other location"
         );
       }
     }
   };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        if (position && "coords" in position) {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        }
+      }, (err) => {
+        NotificationManager.error(err.message + "Please navigate manually or allow location")
+      });
+    } else {
+      NotificationManager.error(
+        "Cannot fetch your location. Redirecting to a default location"
+      );
+    }
+  }, []);
 
   const [primaryRoute, setPrimaryRoute] = useState<any>();
 
@@ -88,6 +118,7 @@ const RouteMap: FC<IRouteMap> = (props) => {
     <MapContainer
       style="mapbox://styles/mapbox/satellite-streets-v11"
       zoom={9}
+      center={userLocation ? [userLocation.lng, userLocation.lat] : undefined}
       containerProps={{
         className: "w-full h-full",
       }}

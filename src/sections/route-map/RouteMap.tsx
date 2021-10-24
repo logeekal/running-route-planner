@@ -73,9 +73,8 @@ const RouteMap: FC<IRouteMap> = (props) => {
 
   useEffect(() => {
     if (locations.length > 1) {
-      // draw route
       setLoading(true);
-      debugger;
+      // draw route
       const mapBoxService = new MapBoxService();
 
       const coordinates = locations.map(
@@ -104,13 +103,13 @@ const RouteMap: FC<IRouteMap> = (props) => {
 
           setPrimaryRoute(geojson);
           onRoute(json);
+          setLoading(false);
         })
         .catch((_) => {
           NotificationManager.error(
             "Some Error Occured in retreiving the route. Please try later."
           );
         });
-      setLoading(false);
     }
   }, [locations]);
 

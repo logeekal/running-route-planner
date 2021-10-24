@@ -64,7 +64,7 @@ export default function DragList(props: IDragList) {
       const result = props.children.map((child, index) => {
         if (isValidElement(child)) {
           return cloneElement(child, {
-            ...child.props,
+            ...child.props as  {},
           });
         } else {
           throw new Error("Not a valid element");

@@ -24,11 +24,10 @@ import {
 import MapBoxService from "../../services/MapboxService";
 
 export interface IRouteMap {
-  onRoute: ( route: any ) => void
+  onRoute: (route: any) => void;
 }
 
 const RouteMap: FC<IRouteMap> = (props) => {
-
   const { onRoute } = props;
   const {
     locations,
@@ -80,17 +79,17 @@ const RouteMap: FC<IRouteMap> = (props) => {
                 },
               ],
             },
-          }
-          
+          };
+
           setPrimaryRoute(geojson);
-          onRoute(json)
+          onRoute(json);
         });
     }
   }, [locations]);
 
   return (
     <MapContainer
-      style="mapbox://styles/mapbox/streets-v11"
+      style="mapbox://styles/mapbox/satellite-streets-v11"
       zoom={9}
       containerProps={{
         className: "w-full h-full",
@@ -98,24 +97,39 @@ const RouteMap: FC<IRouteMap> = (props) => {
       onClick={(e) => handleLocationSelectionFromMap(e)}
     >
       {primaryRoute ? (
-        <Layer id="primaryRoute" type="line" source={primaryRoute} />
+        <Layer id="primaryRoute" type="line" source={primaryRoute} 
+          paint={{
+            "line-color": "#6478d7",
+            "line-width": 8
+          }}
+          layout= {{
+            "line-join": "round",
+            "line-cap":  "round"
+          }}
+          
+        />
       ) : (
         <></>
       )}
 
       {locations.map((location, idx) => {
         return (
-          <Stop
-            feature={location}
-            key={location.id}
-            icon={
-              <div className="absolute w-8 h-8 p-1 text-white bg-black rounded-full grid place-items-center" style={{
-              transform :"translate(-50%, -50%)"
-                }}>
-                {idx + 1}
-              </div>
-            }
-          />
+          <div className={location.id}>
+            <Stop
+              feature={location}
+              key={location.id}
+              icon={
+                <div
+                  className="absolute w-8 h-8 p-1 text-white bg-black rounded-full grid place-items-center"
+                  style={{
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  {idx + 1}
+                </div>
+              }
+            />
+          </div>
         );
       })}
     </MapContainer>

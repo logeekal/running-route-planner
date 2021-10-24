@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from "react";
-import mgl, { AnySourceData, Layer as LayerType } from "mapbox-gl";
+import mgl, { AnyLayer, AnySourceData, Layer as LayerType } from "mapbox-gl";
 import { useMap } from "./MapContainer";
 
 {
@@ -14,7 +14,7 @@ import { useMap } from "./MapContainer";
    */
 }
 const Layer: FC<LayerType> = (props) => {
-  const { id, type, source } = props;
+  const { id, type, source, ...restProps } = props;
 
   const layerIDRef = useRef<string>();
   layerIDRef.current = id;
@@ -48,10 +48,7 @@ const Layer: FC<LayerType> = (props) => {
         id,
         type: type as any,
         source: id,
-        /*
-         *layout,
-         *paint: paint as any
-         */
+        ...restProps as any
       });
     }
   }, [source]);

@@ -18,13 +18,10 @@ import { ILocations } from "../../utils/types";
 type IStop = HTMLProps<HTMLDivElement> & {
   feature: ILocations["features"][0];
   icon: ReactNode;
-  index: number;
 };
 
 const Stop: FC<IStop> = (props) => {
-  const { feature, index, children, icon, ...restProps } = props;
-
-  const [el, setEl] = useState<HTMLElement>();
+  const { feature, children, icon, ...restProps } = props;
 
   const { map, markers, setMarkers } = useMap();
 

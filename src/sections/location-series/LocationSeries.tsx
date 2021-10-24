@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
-import MapBoxService from "../../services/MapboxService";
+import { useState } from "react";
 import { reOrderArray } from "../../utils";
+import "./LocationSeries.scss"
 
-import { useLocation } from "../../contexts/location/location-provider";
+import { useLocation } from "../../contexts/location/LocationProvider";
 import DragList from "../../components/drag-list/DragList";
 import DragListItem from "../../components/drag-list/DragListItem";
 
@@ -19,12 +19,7 @@ const LocationSeries: React.FC<ILocationSeriesProps> = (props) => {
     setLocations,
   } = useLocation();
 
-  const [mapboxService, _] = useState(() => new MapBoxService());
-
-
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
+  const [draggedElementId, setDraggedElementId] = useState<string>()
 
   const handleRemoval = (removedId: string) => {
     setLocations((prev: any) => {
@@ -49,13 +44,21 @@ const LocationSeries: React.FC<ILocationSeriesProps> = (props) => {
 
   return (
     <div className="flex flex-col">
-      <DragList className="flex flex-col gap-2" onReorder={handleRorder} removable={false}>
+      <DragList className="flex flex-col location__list gap-2" onReorder={handleRorder} removable={false}>
         {locations.map((currLocation) => (
           <DragListItem
+            className="location__item"
             id={currLocation.id}
             onRemove={() => handleRemoval(currLocation.id)}
+            onDragStatusUpdate ={ (status) => {
+              if (status === "DRAGGING") {
+                setDraggedElementId(currLocation.id)
+              }else {
+                setDraggedElementId(undefined)
+              }
+            } }
           >
-            <div className="flex items-center justify-between w-full text-default">
+            <div className="flex items-center justify-between w-full">
               <div className="flex flex-row items-center justify-center">
                 <span className="px-2 mt-1 cursor-move">
                   <ImMenu2 />

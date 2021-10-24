@@ -1,6 +1,6 @@
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import LocationSeries from "./sections/location-series/LocationSeries";
-import LocationProvider from "./contexts/location/location-provider";
+import LocationProvider from "./contexts/location/LocationProvider";
 import RouteMap from "./sections/route-map/RouteMap";
 import geoJson2GPX from "./utils/geojson2gpx";
 import SideNav from "./components/layout/SideNav";
@@ -22,7 +22,7 @@ export default function App() {
     }
 
     const gpxString = geoJson2GPX(navigableRoute);
-    downloadStringAsFile(gpxString, "application/xml", routeName + ".gpx");
+    downloadStringAsFile(gpxString, "application/xml", routeName.replaceAll(" ", "_") + ".gpx");
   };
 
   const downloadStringAsFile = (
@@ -47,8 +47,10 @@ export default function App() {
     e.preventDefault();
     setMode("READ");
   };
-  console.log({ inputRef });
 
+  useEffect(()=>{ 
+    document.title = `Welcome to JK Route Planner - ${routeName}`
+  },[routeName])
   return (
     <LocationProvider>
       <div className="flex flex-row h-screen theme-normal bg-primary text-primary">
@@ -97,7 +99,7 @@ export default function App() {
               </div>
             </div>
             <button
-              className="w-5/6 py-2 font-bold btn__download-route bg-accent rounded-normal text-secondary "
+              className="w-5/6 py-2 font-bold btn__download-route bg-accent rounded-normal text-inverse "
               type="button"
               onClick={handleGPXDownload}
             >

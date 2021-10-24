@@ -45,7 +45,6 @@ const Stop: FC<IStop> = (props) => {
     };
   }, []);
 
-  console.log({ markers });
 
   useEffect(() => {
     if (!icon) return;
@@ -58,14 +57,12 @@ const Stop: FC<IStop> = (props) => {
   }, [icon]);
 
   useEffect(() => {
-    console.log({ marker });
     if (marker) {
       setMarkers((prev: Array<mgl.Marker>) => {
         const markerExists = prev.findIndex(
           (item) => item.getElement().id === markerRef.current!.id
         );
         if (markerExists !== -1) {
-          console.log(markerExists);
           return [...prev];
         } else {
           marker.addTo(map!);

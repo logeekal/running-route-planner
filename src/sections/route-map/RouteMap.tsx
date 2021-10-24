@@ -4,8 +4,10 @@ import Layer from "../../components/map/Layer";
 import MapContainer from "../../components/map/MapContainer";
 import Stop from "../../components/map/Stop";
 import Spinner from "../../components/spinner/Spinner";
-import { useLocation } from "../../contexts/location/location-provider";
+import { useLocation } from "../../contexts/location/LocationProvider";
 import MapBoxService from "../../services/MapboxService";
+// @ts-ignore @eslint-disable
+import {  NotificationContainer,  NotificationManager,} from "react-notifications";
 
 export interface IRouteMap {
   onRoute: (route: any) => void;
@@ -26,8 +28,14 @@ const RouteMap: FC<IRouteMap> = (props) => {
       e.lngLat.lat
     );
     if ("data" in response) {
-      console.log({ "adding-location": locations });
-      setLocations((prev: any) => [...prev, response.data!.features[0]]);
+      if (response.data && "features" in response.data && response.data.features.length > 0) {
+        setLocations((prev: any) => [...prev, response.data!.features[0]]);
+      } else {
+
+        NotificationManager.error(
+          "Some Error Occured in retreiving the location. Please try some other location"
+        );
+      }
     }
   };
 
@@ -41,11 +49,16 @@ const RouteMap: FC<IRouteMap> = (props) => {
       const mapBoxService = new MapBoxService();
 
       const coordinates = locations.map(
-        (location) => location.geometry.coordinates
+        (location: any) => location.geometry.coordinates
       );
       mapBoxService
         .retrieveDirections(coordinates as Array<[number, number]>)
         .then((json) => {
+          if (!("routes" in json)) {
+            NotificationManager.error(
+              "Some Error Occured in retreiving the route. Please try later."
+            );
+          }
           const geojson = {
             type: "geojson",
             data: {
@@ -61,6 +74,11 @@ const RouteMap: FC<IRouteMap> = (props) => {
 
           setPrimaryRoute(geojson);
           onRoute(json);
+        })
+        .catch((_) => {
+          NotificationManager.error(
+            "Some Error Occured in retreiving the route. Please try later."
+          );
         });
       setLoading(false);
     }
@@ -75,6 +93,7 @@ const RouteMap: FC<IRouteMap> = (props) => {
       }}
       onClick={(e: any) => handleLocationSelectionFromMap(e)}
     >
+      <NotificationContainer />
       <Spinner loading={loading} />
       {primaryRoute ? (
         <Layer

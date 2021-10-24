@@ -53,7 +53,6 @@ export default function DragList(props: IDragList) {
     }
     else {
      const initialIndex = Array.from(parentRef.current.children).indexOf(draggedElementId.current)
-      console.log("DragList", initialIndex, draggedElementId.current )
      setDragElementInitialIndex(initialIndex)
     }
   }, [draggedElementId]);
@@ -137,7 +136,6 @@ export default function DragList(props: IDragList) {
             setDragElementFinalIndex(orderedChildren.length - 1)
             return;
           }
-          console.log(nearestNode.el.innerHTML);
           parentRef?.current?.insertBefore(
             draggedElementId.current,
             nearestNode.el
@@ -152,6 +150,7 @@ export default function DragList(props: IDragList) {
           const nearestNode = findNearest(e.clientY, draggedElementId.current);
           if (!nearestNode) return;
           onReorder(dragElementInitialIndex ||0, dragElementFinalIndex || 0)
+          setStatus("END")
         }}
         ref={parentRef}
       >

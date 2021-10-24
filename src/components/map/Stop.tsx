@@ -1,9 +1,7 @@
-import mgl, { LngLatLike, Map, MapboxGeoJSONFeature, Marker } from "mapbox-gl";
+import mgl, { LngLatLike,  Marker } from "mapbox-gl";
 import {
   FC,
   HTMLProps,
-  ReactElement,
-  memo,
   useEffect,
   useRef,
   useState,
@@ -12,7 +10,6 @@ import {
 } from "react";
 import { useMap } from "../../components/map/MapContainer";
 
-import ReactDOMServer from "react-dom/server";
 import { ILocations } from "../../utils/types";
 
 type IStop = HTMLProps<HTMLDivElement> & {
@@ -34,9 +31,7 @@ const Stop: FC<IStop> = (props) => {
 
   useEffect(() => {
     return () => {
-      console.log("cleaning up ", markerRef);
       if (!markerValRef.current) return;
-      console.log("Removing marker", markerRef.current);
       const elementId = markerValRef.current.getElement().id
       const element = document.getElementById(elementId)
       element?.remove()
@@ -45,10 +40,6 @@ const Stop: FC<IStop> = (props) => {
         let newMarkers = prev.filter(
           (item) => item.getElement().id !== markerValRef.current!.getElement().id
         );
-        console.log({
-          prevMarker: prev.length,
-          newMarker: newMarkers.length,
-        });
         return newMarkers;
       });
     };

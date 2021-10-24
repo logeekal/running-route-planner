@@ -59,7 +59,7 @@ export default class MapBoxService {
     const stringCoordinates = coordinates.reduce<string>(
       (prev, current, index) => {
         let delimiter = ";";
-        if (index == 0) {
+        if (index === 0) {
           delimiter = "";
         }
         return prev + delimiter + current.join(",");

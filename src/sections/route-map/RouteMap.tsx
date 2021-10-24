@@ -1,27 +1,10 @@
-import mgl, {
-  Map,
-  LngLatLike,
-  LngLatBoundsLike,
-  LngLatBounds,
-  MapMouseEvent,
-  EventData,
-} from "mapbox-gl";
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { MapMouseEvent, EventData } from "mapbox-gl";
+import { FC, useEffect, useState } from "react";
 import Layer from "../../components/map/Layer";
 import MapContainer from "../../components/map/MapContainer";
 import Stop from "../../components/map/Stop";
 import Spinner from "../../components/spinner/Spinner";
-import {
-  LocationContext,
-  useLocation,
-} from "../../contexts/location/location-provider";
+import { useLocation } from "../../contexts/location/location-provider";
 import MapBoxService from "../../services/MapboxService";
 
 export interface IRouteMap {
@@ -30,13 +13,9 @@ export interface IRouteMap {
 
 const RouteMap: FC<IRouteMap> = (props) => {
   const { onRoute } = props;
-  const {
-    locations,
-    setLocations,
-  } = useContext(LocationContext);
+  const { locations, setLocations } = useLocation();
 
-
-  const [ loading, setLoading ] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const handleLocationSelectionFromMap = async (
     e: MapMouseEvent & EventData
@@ -57,8 +36,8 @@ const RouteMap: FC<IRouteMap> = (props) => {
   useEffect(() => {
     if (locations.length > 1) {
       // draw route
-      setLoading(true)
-      debugger
+      setLoading(true);
+      debugger;
       const mapBoxService = new MapBoxService();
 
       const coordinates = locations.map(
@@ -83,9 +62,8 @@ const RouteMap: FC<IRouteMap> = (props) => {
           setPrimaryRoute(geojson);
           onRoute(json);
         });
-      setLoading(false)
+      setLoading(false);
     }
-    
   }, [locations]);
 
   return (
@@ -99,16 +77,18 @@ const RouteMap: FC<IRouteMap> = (props) => {
     >
       <Spinner loading={loading} />
       {primaryRoute ? (
-        <Layer id="primaryRoute" type="line" source={primaryRoute} 
+        <Layer
+          id="primaryRoute"
+          type="line"
+          source={primaryRoute}
           paint={{
             "line-color": "#6478d7",
-            "line-width": 8
+            "line-width": 8,
           }}
-          layout= {{
+          layout={{
             "line-join": "round",
-            "line-cap":  "round"
+            "line-cap": "round",
           }}
-          
         />
       ) : (
         <></>

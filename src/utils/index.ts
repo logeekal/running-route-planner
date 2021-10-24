@@ -8,7 +8,7 @@ export function reOrderArray<T>(
   let counter = oldIndex;
   const temp = result[oldIndex];
 
-  if (oldIndex == newIndex) {
+  if (oldIndex === newIndex) {
     return result
   }
 

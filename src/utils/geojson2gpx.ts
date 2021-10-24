@@ -21,7 +21,7 @@ export default function geoJson2GPX(geoJSON: IRoute) {
     ],
   };
 
-  geoJSON.routes[0]["geometry"]["coordinates"].map(([lon, lat]: any) => {
+  geoJSON.routes[0]["geometry"]["coordinates"].forEach(([lon, lat]: any) => {
     xmlJson.gpx.forEach(( child : any) => {
       if ('rte' in child) {
         child.rte.push({

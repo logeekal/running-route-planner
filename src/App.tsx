@@ -5,6 +5,8 @@ import RouteMap from "./sections/route-map/RouteMap";
 import geoJson2GPX from "./utils/geojson2gpx";
 import SideNav from "./components/layout/SideNav";
 import { MdModeEdit } from "react-icons/md";
+// @ts-ignore
+import { NotificationManager, NotificationContainer } from 'react-notifications'
 
 export default function App() {
   const [navigableRoute, setNavigableRoute] = useState<any>();
@@ -17,7 +19,7 @@ export default function App() {
 
   const handleGPXDownload = () => {
     if (!navigableRoute) {
-      alert("route not available");
+      NotificationManager.error("No Route Available to download. Please select at least 2 locations.")
       return;
     }
 
@@ -54,6 +56,7 @@ export default function App() {
   return (
     <LocationProvider>
       <div className="flex flex-row h-screen theme-normal bg-primary text-primary">
+        <NotificationContainer />
         <SideNav className="flex flex-col px-4 py-8 flex-grow-1">
           <div className="flex flex-col items-center justify-between h-full py-8 sidemenu__container">
             <div className="flex flex-col w-full sidemenu__location-info">
